@@ -1,8 +1,17 @@
 {
   "name": "@claaslange/pi-progress-bar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Native terminal progress indicator support for pi via OSC 9;4",
-  "keywords": ["pi-package", "terminal", "progress", "osc-9-4", "pi-extension", "ghostty", "wezterm", "iterm2"],
+  "keywords": [
+    "pi-package",
+    "terminal",
+    "progress",
+    "osc-9-4",
+    "pi-extension",
+    "ghostty",
+    "wezterm",
+    "iterm2"
+  ],
   "license": "MIT",
   "author": "Claas Lange",
   "type": "module",
@@ -34,6 +43,8 @@
     "typescript": "~6.0.2"
   },
   "pi": {
-    "extensions": ["./extensions/index.ts"]
+    "extensions": [
+      "./extensions/index.ts"
+    ]
   }
 }
