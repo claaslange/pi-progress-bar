@@ -1,6 +1,6 @@
 {
   "name": "@claaslange/pi-progress-bar",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Native terminal progress indicator support for pi via OSC 9;4",
   "keywords": [
     "pi-package",
@@ -31,9 +31,6 @@
     "README.md",
     "LICENSE"
   ],
-  "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*"
-  },
   "scripts": {
     "check": "tsc --noEmit --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck ./extensions/index.ts"
   },
