@@ -1,0 +1,39 @@
+{
+  "name": "@claaslange/pi-progress-bar",
+  "version": "0.1.0",
+  "description": "Native terminal progress indicator support for pi via OSC 9;4",
+  "keywords": ["pi-package", "terminal", "progress", "osc-9-4", "pi-extension", "ghostty", "wezterm", "iterm2"],
+  "license": "MIT",
+  "author": "Claas Lange",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/claaslange/pi-progress-bar.git"
+  },
+  "homepage": "https://github.com/claaslange/pi-progress-bar#readme",
+  "bugs": {
+    "url": "https://github.com/claaslange/pi-progress-bar/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "extensions/index.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*"
+  },
+  "scripts": {
+    "check": "tsc --noEmit --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck ./extensions/index.ts"
+  },
+  "devDependencies": {
+    "@mariozechner/pi-coding-agent": "~0.64.0",
+    "@types/node": "~25.5.0",
+    "typescript": "~6.0.2"
+  },
+  "pi": {
+    "extensions": ["./extensions/index.ts"]
+  }
+}
