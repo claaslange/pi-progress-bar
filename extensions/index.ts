@@ -3,6 +3,7 @@ import { writeFileSync } from "node:fs";
 
 const CLEAR_PROGRESS_SEQUENCE = "\x1b]9;4;0\x07";
 const INDETERMINATE_PROGRESS_SEQUENCE = "\x1b]9;4;3\x07";
+const ERROR_PROGRESS_SEQUENCE = "\x1b]9;4;2\x07";
 const COMPLETE_PROGRESS_SEQUENCE = "\x1b]9;4;1;100\x07";
 const COMPLETION_FLASH_MS = 800;
 
@@ -11,6 +12,9 @@ const OSC_94_TERM_PROGRAMS = new Set(["ghostty", "wezterm", "iterm.app"]);
 type ProgressTransport = "direct" | "tmux";
 
 let clearTimer: ReturnType<typeof setTimeout> | undefined;
+let agentRunning = false;
+let errorActive = false;
+let handledToolCompletions = new Set<string>();
 
 function supportsOsc94Terminal(): boolean {
 	const termProgram = process.env.TERM_PROGRAM?.toLowerCase();
@@ -65,6 +69,11 @@ function startIndeterminateProgress(): void {
 	writeToTerminal(INDETERMINATE_PROGRESS_SEQUENCE);
 }
 
+function showErrorProgress(): void {
+	clearPendingTimer();
+	writeToTerminal(ERROR_PROGRESS_SEQUENCE);
+}
+
 function flashCompletion(): void {
 	clearPendingTimer();
 	writeToTerminal(COMPLETE_PROGRESS_SEQUENCE);
@@ -79,16 +88,53 @@ function clearProgress(): void {
 	writeToTerminal(CLEAR_PROGRESS_SEQUENCE);
 }
 
+function updateErrorState(isError: boolean): void {
+	if (isError) {
+		errorActive = true;
+		showErrorProgress();
+		return;
+	}
+
+	if (!errorActive) return;
+
+	errorActive = false;
+	if (agentRunning) startIndeterminateProgress();
+	else clearProgress();
+}
+
+function handleToolCompletion(toolCallId: string, isError: boolean): void {
+	if (handledToolCompletions.has(toolCallId)) return;
+	handledToolCompletions.add(toolCallId);
+	updateErrorState(isError);
+}
+
 export default function progressBarExtension(pi: ExtensionAPI) {
 	pi.on("agent_start", async () => {
+		agentRunning = true;
+		errorActive = false;
+		handledToolCompletions = new Set();
 		startIndeterminateProgress();
 	});
 
+	pi.on("tool_execution_end", async (event) => {
+		handleToolCompletion(event.toolCallId, event.isError);
+	});
+
+	pi.on("tool_result", async (event) => {
+		handleToolCompletion(event.toolCallId, event.isError);
+	});
+
 	pi.on("agent_end", async () => {
-		flashCompletion();
+		agentRunning = false;
+		handledToolCompletions = new Set();
+		if (errorActive) clearProgress();
+		else flashCompletion();
 	});
 
 	pi.on("session_shutdown", async () => {
+		agentRunning = false;
+		errorActive = false;
+		handledToolCompletions = new Set();
 		clearProgress();
 	});
 }

@@ -17,7 +17,9 @@ So `@claaslange/pi-progress-bar` only handles `OSC 9;4` progress signaling and i
 ## Behavior
 
 - 🔵 Indeterminate pulse while the agent is thinking or running tools
-- 🟢 Green 100% completion flash when the agent finishes
+- 🔴 Red error state when a tool finishes with an error
+- 🔵 Error state resets back to indeterminate progress after the next non-error tool completion
+- 🟢 Green 100% completion flash when the agent finishes cleanly
 - Clears the progress indicator on shutdown
 - Does **not** modify the terminal title
 
@@ -74,10 +76,21 @@ The extension listens to pi lifecycle events and writes `OSC 9;4` sequences dire
 | Pi event | Action |
 | --- | --- |
 | `agent_start` | start indeterminate progress |
-| `agent_end` | flash green 100% completion, then clear |
+| `tool_execution_end` / `tool_result` with `isError: true` | show red error state |
+| `tool_execution_end` / `tool_result` with `isError: false` after an error | switch back to indeterminate progress |
+| `agent_end` | flash green 100% completion, then clear if no error is active; otherwise clear |
 | `session_shutdown` | clear progress |
 
 Because it writes directly to the terminal, it stays out of pi's normal TUI rendering.
+
+## Development
+
+Run a local manual check that exercises busy → error → reset → success:
+
+```bash
+npm run check
+npm run test:manual
+```
 
 ## Package contents
 

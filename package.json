@@ -1,6 +1,6 @@
 {
   "name": "@claaslange/pi-progress-bar",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Native terminal progress indicator support for pi via OSC 9;4",
   "keywords": [
     "pi-package",
@@ -32,7 +32,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "check": "tsc --noEmit --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck ./extensions/index.ts"
+    "check": "tsc --noEmit --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck ./extensions/index.ts",
+    "test:manual": "script -q /tmp/pi-progress-bar-manual.log bash -lc 'PI_PROGRESS_BAR_FORCE=1 pi --no-extensions --no-session --print --extension ./extensions/index.ts \"Use the bash tool exactly twice. First run: command_that_does_not_exist_12345. Second run: pwd. After the second tool call, reply with exactly DONE.\"' >/dev/null 2>&1 && perl -ne 'print if /\\e\\]9;4;/' /tmp/pi-progress-bar-manual.log"
   },
   "devDependencies": {
     "@mariozechner/pi-coding-agent": "~0.64.0",
